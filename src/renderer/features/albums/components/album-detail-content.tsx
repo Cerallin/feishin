@@ -827,16 +827,20 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
 
     const overrideControls: Partial<ItemControls> = useMemo(() => {
         return {
-            onDoubleClick: ({ index, internalState, item, meta }) => {
+            onDoubleClick: ({ event, index, internalState, item, meta }) => {
                 if (!item) {
                     return;
                 }
+
+                // Swap vs default: play-button click (event null) queues the full
+                // album from this track; row double-click adds only that song.
+                const singleSongOnly = event != null;
 
                 playSongFromItemListControl({
                     index,
                     internalState,
                     item: item as Song,
-                    meta,
+                    meta: { ...meta, singleSongOnly },
                     player,
                 });
             },

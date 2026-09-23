@@ -119,13 +119,30 @@ export const useRowPlayControl = (props: ItemTableListInnerColumn) => {
                 return;
             }
 
+            // Prefer the list's onDoubleClick so page overrides (e.g. album detail
+            // queue-all) apply to row play controls as well.
+            if (props.controls?.onDoubleClick) {
+                const rowId = props.internalState.extractRowId(song);
+                const index = rowId ? props.internalState.findItemIndex(rowId) : -1;
+
+                props.controls.onDoubleClick({
+                    event: null,
+                    index,
+                    internalState: props.internalState,
+                    item: song,
+                    itemType: props.itemType,
+                    meta: { playType, singleSongOnly: true },
+                });
+                return;
+            }
+
             playSongFromItemListControl({
                 item: song as Song,
                 meta: { playType, singleSongOnly: true },
                 player,
             });
         },
-        [album, artist, player, props.itemType, song],
+        [album, artist, player, props.controls, props.internalState, props.itemType, song],
     );
 
     return {
